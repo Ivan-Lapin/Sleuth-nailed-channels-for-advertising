@@ -1,24 +1,22 @@
-FROM python:3.11-slim
+# Dockerfile
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Системные зависимости
-RUN apt-get update && apt-get install -y \
-    gcc \
+# Системные зависимости (минимум)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Python зависимости
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Установка зависимостей
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Код
-COPY . .
+COPY src /app/src
 
-# Данные
-RUN mkdir -p /app/data
-
-# Метрики порт
-EXPOSE 8000
-
-# Запуск
-CMD ["python", "main.py"]
+# По умолчанию ничего не запускаем — в compose зададим command
+CMD ["python", "-m", "src.main_bot"]

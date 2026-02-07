@@ -1,11 +1,36 @@
-# env-файлы с секретами
-.env
-*.env
+*.session
+*.session-journal
+tg_*.session
+stats*.session
+post_analysis*.session
+anon*.session
 
-# виртуальное окружение
-.venv/
-venv/
+# База данных
+data/
+data/tg_global_ads.db
+*.db
+*.db-journal
 
-# прочее
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+env.bak/
+venv.bak/
+.venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+EOF

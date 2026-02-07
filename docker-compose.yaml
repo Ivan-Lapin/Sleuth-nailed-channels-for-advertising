@@ -1,51 +1,47 @@
-version: '3.8'
-
 services:
-  # 🚀 Основной сервис
-  app:
-    build: .
-    ports:
-      - "8000:8000"  # Prometheus метрики
-    volumes:
-      - ./data:/app/data
-    env_file: .env
+  db:
+    image: postgres:16
+    container_name: tgads_db
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/metrics"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # 📊 Prometheus
-  prometheus:
-    image: prom/prometheus:latest
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-    restart: unless-stopped
-
-  # 📈 Grafana (дашборды!)
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_USERS_ALLOW_SIGN_UP=false
+      POSTGRES_DB: telegram_monitoring
+      POSTGRES_USER: pinchik
+      POSTGRES_PASSWORD: qwerty123
+    ports:
+      - "5432:5432"
     volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
-    depends_on:
-      - prometheus
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pinchik -d telegram_monitoring"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  bot:
+    build: .
+    container_name: tgads_bot
     restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["python", "-m", "src.main_bot"]
+
+  worker:
+    build: .
+    container_name: tgads_worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    # Важно: Telethon создаёт session-файл. Чтобы он сохранялся между перезапусками:
+    volumes:
+      - telethon_session:/app
+    command: ["python", "-m", "src.main_worker"]
 
 volumes:
-  prometheus_data:
-  grafana_data:
+  pgdata:
+  telethon_session:
