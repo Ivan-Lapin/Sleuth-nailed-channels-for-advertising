@@ -13,3 +13,10 @@ class BrandsRepo:
         if not row:
             raise ValueError(f"Brand not found: {name}")
         return int(row["id"])
+    
+    async def get_by_id(self, id: int) -> str:
+        name = await self.conn.fetchval("SELECT name FROM brands WHERE id=$1", id)
+        if not name:
+            raise ValueError(f"Brand not found: {id}")
+        return str(name)
+

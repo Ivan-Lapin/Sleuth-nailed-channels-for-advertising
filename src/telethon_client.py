@@ -1,7 +1,7 @@
 # 🔍 Telethon функции
 from telethon import TelegramClient
 from telethon.tl.functions.channels import CheckSearchPostsFloodRequest, SearchPostsRequest
-from database import get_relevant_channels, save_channel_mention
+from db import get_relevant_channels, save_channel_mention
 from config import API_ID, API_HASH, MAIN_SESSION, SEARCH_LIMIT, SESSIONS_DIR
 
 # 📈 Статистика канала через Telegram API

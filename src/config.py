@@ -22,7 +22,7 @@ class Settings:
 
     # search tuning
     search_limit: int = 100
-    tz: str = "Europe/Amsterdam"
+    tz: str = "Europe/Moscow"
     worker_hour_local: int = 23
 
     # throttling

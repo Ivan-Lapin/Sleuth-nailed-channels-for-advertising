@@ -80,10 +80,11 @@ async def global_brand_search(client, conn, brand_name: str, settings) -> dict:
 
         username = getattr(chat, "username", None)
         title = getattr(chat, "title", "") or ""
+        access_hash = getattr(chat, "access_hash", None)
         post_url = f"https://t.me/{username}/{msg.id}" if username else None
         subscribers = getattr(chat, "participants_count", None)
 
-        await posts_repo.upsert_channel(channel_id, title, username, subscribers)
+        await posts_repo.upsert_channel(channel_id, title, username, subscribers, access_hash)
         inserted_post_id = await posts_repo.insert_post(
             channel_id=channel_id,
             brand_id=brand_id,

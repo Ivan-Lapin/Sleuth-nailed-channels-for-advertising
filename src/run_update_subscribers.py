@@ -26,7 +26,7 @@ async def main():
             report = await update_channels_subscribers(
                 client,
                 conn,
-                batch_limit=20,  
+                batch_limit=800,  
                 sleep_sec=1.0,    
             )
             print("📊 Subscribers report:", report)
